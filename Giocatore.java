@@ -1,61 +1,44 @@
-/**
- * @see UdA n. 1: Esercitazione n. 1 - Giocanumeri
- * @author Ilyass Bouafia
- */
+/*
+* Esercitazione 1: GiocaNumeri
+* @author Ilyass Bouafia
+* */
+
 public class Giocatore extends Thread {
     String nome;
-    private String parola;
-    private int punteggio;
+    GestisceGioco g;
 
-    /**
-     * nome del Giocatore
-     */
-    public Giocatore(String nome) {
+    public Giocatore(String nome, GestisceGioco g) {
         this.nome = nome;
-    }
-
-    public String getParola() {
-        return parola;
-    }
-
-    public void setParola(String parola) {
-        this.parola = parola;
-    }
-
-    public int getPunteggio() {
-        return punteggio;
-    }
-
-    public void setPunteggio(int punteggio) {
-        this.punteggio = punteggio;
-    }
-    
-    public void gioca() {
-        int numero = 19;
-        String parola = "staccionata";
-        setParola(parola);
-
-        for (int i = 0; i < numero; i++) {
-            System.out.println("Giocatore : " + nome + " i: " + i);
-            try{
-                sleep(2000);
-            } catch (InterruptedException e){
-                System.err.println("Errore: run-sleep");
-            }
-
-
-        }
-
-        setPunteggio(100);
-
-        System.out.println("Giocatore : " + nome + " parola: " + getParola() + " punteggio: " + punteggio);
-    }
-
-    public void comunica() {
+        this.g = g;
     }
 
     @Override
     public void run() {
-        gioca();
+        int numero;
+        String parola;
+
+        synchronized (g) {
+            numero = g.leggiNumero(nome);
+            parola = g.leggiParola(nome);
+        }
+
+        for (int i = 1; i <= numero; i++) {
+            System.out.println(nome + " conta: " + i);
+            // punto 13: yield
+            Thread.yield();
+        }
+
+        System.out.println(nome + " parola: " + parola.toUpperCase());
+
+        // punto 4: sospensione di 2 secondi
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            // punto 5: errore
+            System.err.println("Errore: sleep interrotto");
+        }
+
+        int punteggio = g.calcolaPunteggio(numero, parola);
+        System.out.println(nome + " numero scelto: " + numero + ", punteggio: " + punteggio);
     }
 }
